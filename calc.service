@@ -1,0 +1,10 @@
+[Unit]
+Description=Control NTP sync
+
+[Service]
+RemainAfterExit=true
+ExecStart=/usr/local/bin/service/calc.sh
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
