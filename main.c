@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -14,6 +15,7 @@
 
 int main( )
 {
+  struct timeval sys_time;
   int my_socket, count;
   int port = 123;
   char* host_address = "us.pool.ntp.org";
@@ -88,7 +90,8 @@ int main( )
 	  exit( 0 );
   }
 
-
+  //get sys time to compare
+  gettimeofday(&sys_time, NULL);
   //translate if need bits in right order
   packet.txTm_s = ntohl( packet.txTm_s );
   packet.txTm_f = ntohl( packet.txTm_f );
@@ -96,6 +99,11 @@ int main( )
   //NTP time format starts date from 1900, but unix from 1970
   packet.txTm_s -= TIME_DIFF;
 
-  printf( "%u", packet.txTm_s );
+  //count difference in seconds
+  unsigned int dif_sec = packet.txTm_s - sys_time.tv_sec;
+  //count difference in microseconds
+  unsigned int dif_microsec = packet.txTm_f - sys_time.tv_usec;
+  //return these differences in stdout
+  printf("Difference between NTP and SYS time is %d.%u", dif_sec, dif_microsec);
   return 0;
 }
